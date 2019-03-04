@@ -1,0 +1,281 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+
+{% block extrahead %}
+    {{ form.media }}
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+{% endblock %}
+
+{% block content %}
+    <form class="container" method="POST" action="{% url 'create' %}" id="create">
+        {% csrf_token %}
+        <h1 class="text-info"> Neue Reservierung erstellen</h1>
+
+        <h5 class="text-dark ml-2">Hallo {{ user }}! Möchtest du eine neue Reservierung erstellen?</h5>
+        <h3 class="mb-4 mt-5 text-muted">Wie oft soll die Veranstaltung reserviert werden?</h3>
+
+        <div class="form-create">
+            <div class="row">
+                <div class="col">
+                    {# Einmalig #}
+                    <div class="card p-3 m-1" style="min-height: 110px">
+                        <div class="row pt-3 pb-3">
+
+                            <div class="col-1">
+                                <input class="center" type="radio" name="templateRadios" id="templateRadio0" value="0"
+                                       v-model="template">
+                            </div>
+
+                            <div class="col">
+                                <p class="center"> Einmalig </p>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    {# jeder x. Wochentag #}
+                    <div class="card p-3 m-1" style="min-height: 110px">
+                        <div class="row pt-3 pb-3">
+                            <div class="col-1">
+                                <input class="center" type="radio" name="templateRadios" id="templateRadio1" value="1"
+                                       v-model="template">
+                            </div>
+                            <div class="col-2">
+                                <p class="center">jeder</p>
+                            </div>
+                            <div class="col-2">
+                                <select class="form-control" name="template1numbers" id=template1numbers">
+                                    <option value="1">1.</option>
+                                    <option value="2">2.</option>
+                                    <option value="3">3.</option>
+                                    <option value="4">4.</option>
+                                    <option value="5">5.</option>
+                                    <option value="6">6.</option>
+                                    <option value="7">7.</option>
+                                    <option value="8">8</option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <select class="form-control" name="template1weekdays" id="template1weekdays">
+                                    {% for key, value in weekdays.items %}
+                                        <option value="{{ key }}">{{ value }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {# jeder Wochentag #}
+                    <div class="card p-3 m-1" style="min-height: 110px">
+                        <div class="row pt-3 pb-3">
+                            <div class="col-1">
+                                <input class="center" type="radio" name="templateRadios" id="templateRadio2" value="2"
+                                       v-model="template">
+                            </div>
+                            <div class="col-2">
+                                <p class="center">jeder</p>
+                            </div>
+                            <div class="col">
+                                <select class="form-control" name="template2weekdays" id="template2weekdays">
+                                    {% for key, value in weekdays.items %}
+                                        <option value="{{ key }}">{{ value }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    {# jeder x. im Monat #}
+                    <div class="card p-3 m-1 mb-3" style="min-height: 110px">
+                        <div class="row">
+                            <div class="col-1">
+                                <input class="center" type="radio" name="templateRadios" id="templateRadio3" value="3"
+                                       v-model="template">
+                            </div>
+                            <div class="col-2">
+                                <p class="center">jeder</p>
+                            </div>
+                            <div class="col-6">
+                                <div class="center">
+                                    <input v-model="range" type="range" class="form-control" id="formControlRange" name="monthday"
+                                           min="1"
+                                           max="31">
+                                    <input v-model="range" type="text" class="form-control" id="formControlRange">
+                                </div>
+
+                            </div>
+                            <div class="col-3">
+                                <p class="center">im Monat</p>
+                            </div>
+                            <div class="col ">
+
+                                <div class="card bg-warning mt-3" v-show="template == 3">
+                                    <div class="card-header">Achtung</div>
+                                    <div class="card-body">
+                                        <p class="card-text">In Monaten, die weniger Tage haben als angegeben, wird
+                                            keine
+                                            Reservierung ausgeführt!</p>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+        <h3 class="mb-4 mt-5 text-muted">Über die Veranstaltung</h3>
+
+        <div class="mb-5">
+            <label for="name">Name der Veranstaltung</label>
+            <input type="text" class="form-control" id="name" name="name" placeholder="Mittagspause">
+        </div>
+
+        <div class="mb-5">
+            <label for="object">Was soll reserviert werden?</label>
+            <select class="form-control" name="object" id="object">
+                {% for object in objects %}
+                    <option value="{{ object.id }}"><p class="text-danger">{{ object.category }} | - {{ object.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+
+        <div class="row">
+            <div class="col">
+                {#start-date#}
+                <div class="fieldWrapper">
+                    {% if form.start_date.errors %}
+                        <div class="card bg-danger text-white">
+                            {{ form.start_date.errors }}
+                        </div>
+                    {% endif %}
+                    <label for="{{ form.start_date.id_for_label }}" v-show="template != 0">Anfang des
+                        Reservierungszeitraumes</label>
+                    <label for="{{ form.start_date.id_for_label }}" v-show="template == 0">Datum</label>
+                    {{ form.start_date }}
+                </div>
+            </div>
+
+
+            <div class="col" v-show="template != 0">
+                {#end-date#}
+                <div class="fieldWrapper">
+                    {% if form.end_date.errors %}
+                        <div class="card bg-danger text-white">
+                            {{ form.end_date.errors }}
+                        </div>
+                    {% endif %}
+                    <label for="{{ form.end_date.id_for_label }}">Ende des Reservierungszeitraumes</label>
+                    {{ form.end_date }}
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row mt-5">
+            <div class="col">
+                {#start-time#}
+                <div class="fieldWrapper">
+                    {% if form.start_time.errors %}
+                        <div class="card bg-danger text-white">
+                            {{ form.start_time.errors }}
+                        </div>
+                    {% endif %}
+                    <label for="{{ form.start_time.id_for_label }}">Beginn der Veranstaltung</label>
+                    {{ form.start_time }}
+                </div>
+            </div>
+
+
+            <div class="col">
+                {#end-time#}
+                <div class="fieldWrapper">
+                    {% if form.end_time.errors %}
+                        <div class="card bg-danger text-white">
+                            {{ form.end_time.errors }}
+                        </div>
+                    {% endif %}
+                    <label for="{{ form.end_time.id_for_label }}">Ende der Veranstaltung</label>
+                    {{ form.end_time }}
+                </div>
+            </div>
+        </div>
+
+        <h3 class="mb-4 mt-5 text-muted">Noch etwas hinzuzufügen?</h3>
+
+
+        <div class="row mt-3">
+            <div class="col">
+                {# Notes #}
+                <div class="">
+                    <label for="notes">Notizen (optional)</label>
+                    <textarea class="form-control" name="notes" id="notes" rows="3"></textarea>
+                </div>
+            </div>
+
+
+            <div class="col">
+                {# Materials #}
+                <div class="">
+                    <label for="materials">Materialien (optional)</label>
+                    <textarea class="form-control" name="materials" id="materials" rows="3"></textarea>
+                </div>
+            </div>
+        </div>
+
+
+        <label for="colorRadios">Farbe (optional)</label>
+        <div class="row">
+            {% for color in colors %}
+                <div class="col">
+                    <div class="card bg-{{ color }}">
+                        <div class="card-body">
+                            <input class="form-check-input color-radio" type="radio" name="colorRadios"
+                                   id="color-radio{{ color }}" value="{{ color }}">
+                        </div>
+                    </div>
+                </div>
+
+            {% endfor %}
+        </div>
+        <h3 class="mb-4 mt-5 text-muted">Fertig?</h3>
+
+        <input type="submit" value="Reservieren" class="btn btn-primary mb-3"/>
+
+    </form>
+
+    <style>
+        .center {
+            position: relative;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .color-radio {
+            position: relative;
+            top: 50%;
+            left: 20%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+
+    <script>
+        var create = new Vue({
+            el: '#create',
+            data: {
+                range: 1,
+                template: 0
+            }
+        })
+    </script>
+{% endblock %}

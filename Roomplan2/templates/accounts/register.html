@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+    <div class="container">
+    <h3> Registerieren! </h3>
+
+    <form method="POST" action="{% url 'register' %}">
+
+        {% csrf_token %}
+
+        <label for="username">Benutzername</label>
+        <input type="text" name="username" class="form-control" id="username"/><br>
+
+        <label for="password">Passwort</label>
+        <input type="password" name="password" class="form-control" id="password"/><br>
+
+        <label for="password_confirn">Passwort (wiederholen)</label>
+        <input type="password" name="password_confirm" class="form-control" id="password_confirm"/><br>
+
+        {% if error %}
+            <div class="alert alert-danger" role="alert">{{ error }}</div>
+        {% endif %}
+
+        <input type="submit" value="Registrieren!" class="btn btn-primary"/>
+        <p class="m-2"> Schon registriert? <a href="{% url 'login' %}"> hier einloggen!</a></p>
+
+
+    </form>
+    </div>
+
+
+
+{% endblock %}

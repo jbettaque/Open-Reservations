@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+
+{% block extrahead %}
+    {{ form.media }}
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
+          integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+{% endblock %}
+
+{% block content %}
+    <div class="ml-5" id="week">
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col" class=""></th>
+
+                {% for day in days %}
+                    <th scope="col" class="pl-5 pr-5">{{ day.string }}</th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for object in objects %}
+                <tr>
+                    <th scope="row">
+                        <div class="text-capitalize text-muted">{{ object.category }}</div>
+                        {{ object }}</th>
+
+                    {% for result in results %}
+
+
+                        <td>
+
+                            {% for reservation in result.reservationlist %}
+                                {% if reservation.reservedObject == object %}
+                                    <div class="card bg-{{ reservation.color }} m-1" style="width: 12rem;"
+                                         v-on:click="showModalVue('#{{ reservation.id }}Modal')">
+                                        <div class="card-body">
+                                            <p class="card-title {% if reservation.text_islight %} text-light {% endif %}">
+                                                <strong>{{ reservation.name }}</strong></p>
+                                            <p class="card-subtitle {% if reservation.text_islight %} text-light {% else %} text-muted {% endif %}">{{ reservation.start_time_string }}
+                                                - {{ reservation.end_time_string }}</p>
+                                        </div>
+                                    </div>
+
+                                    {# Modal #}
+                                    <div class="modal" id="{{ reservation.id }}Modal" tabindex="-1" role="dialog">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header bg-{{ reservation.color }}">
+                                                    <h5 class="modal-title {% if reservation.text_islight %} text-light {% endif %}">{{ reservation.name }}</h5>
+                                                    <button type="button" class="close" data-dismiss="modal"
+                                                            aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <h5 class="mb-3">
+                                                        {{ reservation.start_time_string }} - {{ reservation.end_time_string }}
+                                                    </h5>
+                                                    <div class="card m-1">
+                                                        {% if reservation.notes %}
+                                                            <div class="card-header bg-light">
+                                                                <i class="fas fa-marker mr-3 text-{{ reservation.color }} {% if reservation.color == "" %} text-dark {% endif %}"> </i>Notizen
+                                                            </div>
+                                                            <div class="card-body">
+                                                                <p class="text-muted"> {{ reservation.notes }}
+                                                                </p>
+                                                            </div>
+                                                        {% else %}
+                                                            <p class="text-muted m-2">Keine Notizen</p>
+
+                                                        {% endif %}
+                                                    </div>
+
+
+                                                    <div class="card m-1">
+                                                        {% if reservation.materials %}
+
+                                                            <div class="card-header  bg-light">
+                                                                <i class="fas fa-archive mr-3 text-{{ reservation.color }} {% if reservation.color == "" %} text-dark {% endif %}"></i>Materialien
+                                                            </div>
+                                                            <div class="card-body">
+                                                                <p class="text-muted"> {{ reservation.materials }}
+                                                                </p>
+                                                            </div>
+                                                        {% else %}
+                                                            <p class="text-muted m-2">Keine Materialien</p>
+
+
+                                                            </div>
+                                                        {% endif %}
+
+                                                </div>
+
+
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-{{ reservation.color }} {% if reservation.color == "" %} btn-secondary {% endif %}">
+                                                        <i class="far fa-edit text-light mr-2"></i>Bearbeiten
+                                                    </button>
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                                        <i class="fas fa-times mr-2"></i>Schließen
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+
+                        </td>
+
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+    <script>
+
+        new Vue({
+            el: '#week',
+            methods: {
+                showModalVue: function (modalid) {
+                    $(modalid).modal('show')
+                }
+            }
+        })
+    </script>
+
+
+{% endblock %}
