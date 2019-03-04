@@ -11,7 +11,7 @@
 {% block content %}
     <div class="ml-5" id="week">
         <table class="table">
-            <thead>
+            <thead class="mb-5 fixme">
             <tr>
                 <th scope="col" class=""></th>
 
@@ -118,9 +118,29 @@
         </table>
     </div>
 
+{#    <div class="spacer">#}
+{##}
+{#    </div>#}
+
 
     <script>
-
+{##}
+{#        var fixmeTop = $('.fixme').offset().top;#}
+{#        $(window).scroll(function () {#}
+{#            var currentScroll = $(window).scrollTop();#}
+{#            if (currentScroll >= fixmeTop) {#}
+{#                $('.fixme').css({#}
+{#                    position: 'fixed',#}
+{#                    top: '0',#}
+{#                    left: '0'#}
+{#                });#}
+{#            } else {#}
+{#                $('.fixme').css({#}
+{#                    position: 'static'#}
+{#                });#}
+{#            }#}
+{#        });#}
+{##}
         new Vue({
             el: '#week',
             methods: {
@@ -130,6 +150,20 @@
             }
         })
     </script>
+
+    <style>
+        .fixme {
+            position: -webkit-sticky; /* Safari & IE */
+            position: sticky;
+            background: #FAFAFA;
+            z-index: 99;
+            top: 0;
+        }
+
+        .spacer {
+            margin-top: 600px;
+        }
+    </style>
 
 
 {% endblock %}
